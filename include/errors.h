@@ -5,9 +5,9 @@
 #ifndef INCLUDE_ERRORS_H
 #define INCLUDE_ERRORS_H
 
-//errors
+// errors
+#define IS_DIRTY_TOKEN "dirty token : UAF risk"
 
-
-//warning
+// warning
 
 #endif /*INCLUDE_ERRORS_H*/

@@ -8,8 +8,8 @@ file(GLOB_RECURSE SOURCE_FILES
     "${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/*.c"
 )
 
-# executable name : kfx
-add_executable(kfx ${SOURCE_FILES})
+# executable name : kfgx
+add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 target_compile_features(${PROJECT_NAME} PRIVATE
     c_std_11
@@ -21,7 +21,8 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/src/core/cli
+    ${CMAKE_SOURCE_DIR}/include/kernforgex/
+    ${CMAKE_SOURCE_DIR}/src/kernforgex/
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE

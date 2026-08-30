@@ -19,8 +19,8 @@
 #include "debug.h"
 
 static unsigned int dbg_loglevel =
-    (DBG_LOGLEVEL_FATAL | DBG_LOGLEVEL_WARN | DBG_LOGLEVEL_ERROR | DBG_LOGLEVEL_INFO |
-     DBG_LOGLEVEL_DEBUG);
+    (DBG_LOGLEVEL_FATAL | DBG_LOGLEVEL_WARN | DBG_LOGLEVEL_ERROR |
+     DBG_LOGLEVEL_INFO | DBG_LOGLEVEL_DEBUG);
 
 unsigned int get_debug_loglevel(void)
 {
