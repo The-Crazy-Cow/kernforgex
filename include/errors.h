@@ -6,6 +6,7 @@
 #define INCLUDE_ERRORS_H
 
 // errors
+#define IS_DIRTY_TOKEN "dirty token : UAF risk"
 
 // warning
 
