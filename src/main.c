@@ -2,22 +2,28 @@
 //
 // vim: set ts=8 sw=8 noet tw=80 cc=80 fo+=t :
 
+#include "clicntl.h"
+#include "parser.h"
 #include <stdio.h>
 #include <string.h>
-#include "parser.h"
 
 int main(int argc, char *argv[], char *envp[])
 {
     (void)envp;
 
-    struct kfgx_cmd_struct cmd = {0};
+    struct kfgx_cmd_struct cmd = {
+        .ltokens = NULL,
+        .args_nr = argc,
+        .flags = 0,
+        .ret = 0,
+    };
 
-    if (kfgx_cli_parser(&cmd, argc - 1, (const char **)(argv + 1))) {
+    if (kfgx_cli_parser(&cmd, (argv + 1))) {
         fprintf(stderr, "Error: Parsing failed\n");
         return -1;
     }
 
-    // ------ testing purpose
+#ifdef DEBUG
     token *t = cmd.ltokens;
     while (t) {
         if (t->option)
@@ -29,8 +35,9 @@ int main(int argc, char *argv[], char *envp[])
         printf("\n");
         t = t->next;
     }
-    // ------------------------
-
+    //--------------------------------------
+#endif
+    kfgx_execute_handler(&cmd);
     kfgx_cli_token_free(cmd.ltokens);
 
     return 0;

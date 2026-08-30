@@ -49,34 +49,23 @@ static inline int set_token_valid(token *t)
  *
  * @return 0 on success, -1 on error.
  */
-static int check_cli_args(
-    struct kfgx_cmd_struct *cmd, const int args_nr, const char **args_set)
+static int check_cli_args(struct kfgx_cmd_struct *cmd, const char **args_set)
 {
     int nr [[maybe_unused]];
     const char **set [[maybe_unused]];
 
     if (!cmd) {
-        pr_warn("kfgx_cmd_struct *cmd=0x00 (null ptr)");
+        pr_warn("kfgx_cmd_struct *cmd=%p", (void *)cmd);
         return -1;
     }
 
-    if (args_nr == 0) {
-        if (args_set) {
-            pr_warn("args_set is not NULL, but args_nr=%d", args_nr);
-            return -1;
-        }
-
-        pr_debug("args_nr=0");
-        return 0;
-    }
-
     if (!args_set) {
-        pr_warn("args_set=NULL, but args_nr=%d", args_nr);
+        pr_warn("args_set=NULL, but args_nr=%d", cmd->args_nr);
         return -1;
     }
 
 #ifdef STRICT_MODE
-    nr = args_nr;
+    nr = cmd->args_nr;
     set = args_set;
 
     while (*set++) {
@@ -159,8 +148,8 @@ error:
     return NULL;
 }
 
-static int kfgx_cli_tokenizer_impl(
-    struct kfgx_cmd_struct *cmd, const int args_nr, const char **args_set)
+static int
+kfgx_cli_tokenizer_impl(struct kfgx_cmd_struct *cmd, const char **args_set)
 {
     const char **set;
     const char *tok;
@@ -168,9 +157,6 @@ static int kfgx_cli_tokenizer_impl(
 
     token *curr = NULL;
     token *new_token;
-
-    if (args_nr < 0 || !args_set || !cmd)
-        return -1;
 
     // Locate the tail if a token list already exists
     if (cmd->ltokens) {
@@ -204,15 +190,16 @@ static int kfgx_cli_tokenizer_impl(
             free(opt_tmp);
         } else {
             /*
-             * Flag format "-foo"
-             * option : "-foo"
+             * Flag format "-foo" | "foo"
+             * option : "-foo" | foo
              * value  : NULL
              */
             new_token = kfgx_cli_get_new_token(tok, NULL);
         }
 
         if (!new_token) {
-            pr_warn("new_token=0x00 (null ptr) failed on token allocation");
+            pr_warn(
+                "new_token=%p failed on token allocation", (void *)new_token);
             return -1;
         }
 
@@ -229,10 +216,10 @@ static int kfgx_cli_tokenizer_impl(
     return 0;
 }
 
-static int kfgx_cli_parser_impl(
-    struct kfgx_cmd_struct *cmd, const int args_nr, const char **args_set)
+static int
+kfgx_cli_parser_impl(struct kfgx_cmd_struct *cmd, const char **args_set)
 {
-    return kfgx_cli_tokenizer_impl(cmd, args_nr, args_set);
+    return kfgx_cli_tokenizer_impl(cmd, args_set);
 }
 
 /**
@@ -244,13 +231,12 @@ static int kfgx_cli_parser_impl(
  *
  * @return 0 on success, -1 on error.
  */
-int kfgx_cli_tokenizer(
-    struct kfgx_cmd_struct *cmd, const int args_nr, const char **args_set)
+int kfgx_cli_tokenizer(struct kfgx_cmd_struct *cmd, const char **args_set)
 {
-    if (check_cli_args(cmd, args_nr, args_set))
+    if (check_cli_args(cmd, args_set))
         return -1;
 
-    return kfgx_cli_tokenizer_impl(cmd, args_nr, args_set);
+    return kfgx_cli_tokenizer_impl(cmd, args_set);
 }
 
 /**
@@ -262,10 +248,15 @@ int kfgx_cli_tokenizer(
  *
  * @return 0 on success, -1 on error.
  */
-int kfgx_cli_parser(struct kfgx_cmd_struct *cmd, int args_nr, char **args_set)
+int kfgx_cli_parser(struct kfgx_cmd_struct *cmd, char **args_set)
 {
-    if (check_cli_args(cmd, args_nr, (const char **)args_set))
+    if (cmd->args_nr == 0) {
+        pr_debug("args_nr=0");
+        return 0;
+    }
+
+    if (check_cli_args(cmd, (const char **)args_set))
         return -1;
 
-    return kfgx_cli_parser_impl(cmd, args_nr, (const char **)args_set);
+    return kfgx_cli_parser_impl(cmd, (const char **)args_set);
 }
