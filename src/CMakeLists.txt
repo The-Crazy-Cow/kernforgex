@@ -21,6 +21,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/kernforgex/
     ${CMAKE_SOURCE_DIR}/src/kernforgex/
 )
 
