@@ -53,7 +53,7 @@ struct handler {
     void (*usage)(void);
     int (*handler)(struct kfgx_cmd_struct *);
 };
-
+int kfgx_default_handler(struct kfgx_cmd_struct *cmd);
 int get_token_flags(token *);
 int kfgx_get_handler(struct kfgx_cmd_struct *cmd);
 int kfgx_execute_handler(struct kfgx_cmd_struct *cmd);
