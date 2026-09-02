@@ -55,7 +55,45 @@ static token_t *kfgx_tokens_cleanup_unmatched(token_t *head)
             curr = next;
         }
     }
+    pr_debug("cleanup unmatched options,tokens=%p", (void *)head);
     return head;
+}
+
+/**
+ * @brief Chains the option structures of sequentially matched tokens.
+ *
+ * Traverses the filtered token list and links each option's @c next pointer
+ * to the subsequent token's option structure. Ensures the last matched option's
+ * @c next pointer is explicitly set to NULL.
+ *
+ * @param[in,out] head Head of the (filtered) matched tokens list.
+ *
+ * @return 0 on success.
+ * @return -1 if @p head is NULL or an invalid token containing a NULL option is
+ * found.
+ */
+[[maybe_unused]]
+static void chained_matched_options(token_t *head)
+{
+    token_t *t;
+
+    if (!head)
+        pr_debug("token list is empty");
+
+    foreach_node(t, head)
+    {
+        if (!t->opt) {
+            pr_fatal("NULL option found: cleanup or token setup failed");
+            exit(-1);
+        }
+
+        if (t->next && t->next->opt) {
+            t->opt->next = t->next->opt;
+        } else {
+            t->opt->next = NULL;
+        }
+    }
+    pr_debug("chained matched options");
 }
 
 /**
@@ -99,7 +137,7 @@ static int kfgx_cli_tokenizer_impl(struct kfgx_cmd_struct *cmd)
 
             foreach_node(t, lt)
             {
-                if (t->opt && HAVE_LONG_OPTION(t->opt->l_opt, key)) {
+                if (t->opt && HAVE_OPTION(t->opt->l_opt, key)) {
                     t->match = 1;
 
                     if (*(c + 1) == '\0') {
@@ -122,8 +160,7 @@ static int kfgx_cli_tokenizer_impl(struct kfgx_cmd_struct *cmd)
 
             foreach_node(t, lt)
             {
-                pr_debug("%s", t->opt->l_opt);
-                if (t->opt && HAVE_LONG_OPTION(t->opt->l_opt, arg)) {
+                if (t->opt && HAVE_OPTION(t->opt->l_opt, arg)) {
                     t->match = 1;
                     matched = 1;
                     break;
@@ -135,8 +172,9 @@ static int kfgx_cli_tokenizer_impl(struct kfgx_cmd_struct *cmd)
                     char short_str[2] = {*p, '\0'};
                     foreach_node(t, lt)
                     {
-                        if (t->opt &&
-                            HAVE_SHORT_OPTION(t->opt->s_opt, short_str)) {
+                        if (t->opt && HAVE_OPTION(
+                                          t->opt->s_opt + 1,
+                                          short_str)) { // to avoid the '-'
                             t->match = 1;
                             break;
                         }
@@ -146,9 +184,9 @@ static int kfgx_cli_tokenizer_impl(struct kfgx_cmd_struct *cmd)
         }
         set++;
     }
-
 end:
     cmd->handler->ltokens = kfgx_tokens_cleanup_unmatched(lt);
+    chained_matched_options(cmd->handler->ltokens);
     return 0;
 }
 

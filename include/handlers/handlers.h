@@ -18,8 +18,9 @@
 struct kfgx_cmd_struct;
 typedef struct kfgx_token token_t;
 typedef struct handler handler_t;
-typedef int (*init_options_t)(handler_t *h);
-typedef int (*handler_action_t)(struct kfgx_cmd_struct *cmd);
+typedef struct kfgx_opt opt_t;
+typedef int (*init_options_t)(handler_t *);
+typedef int (*handler_action_t)(opt_t *opt);
 
 /**
  * @brief Action callback signature executed when a handler predicate matches.
@@ -27,11 +28,9 @@ typedef int (*handler_action_t)(struct kfgx_cmd_struct *cmd);
  * @param[in,out] cmd Pointer to the command context structure.
  * @return 0 on success, or a negative error code on failure.
  */
-
 typedef struct handler {
     handler_action_t action;
     init_options_t init_opt;
-    void (*usage)(void);
     const char *name;
     const int prio;
     token_t *ltokens; /* head (last add to the first) of Linked list of

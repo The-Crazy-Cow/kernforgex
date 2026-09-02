@@ -56,7 +56,6 @@ static inline void kfgx_token_free(token_t *t)
 
     while (t) {
         next = t->next;
-        pr_debug("%s", t->opt->l_opt);
         if (t->free && t->opt) {
             free(t->opt->l_opt);
             free(t->opt->s_opt);

@@ -28,12 +28,6 @@ static void kfgx_default_handler_usage(void)
     pr_info("  --help, -h     Show this help message");
     pr_info("  --version, -v  Show version information");
     pr_info("  --verbose, -V  Enable verbose output");
-    pr_info("  --config, -c   Specify configuration file");
-    pr_info("  --output, -o   Specify output file");
-    pr_info("  --input, -i    Specify input file");
-    pr_info("  --list, -l     List available options");
-    pr_info("  --reset, -r    Reset to default settings");
-    pr_info("  --status, -s   Show current status");
 }
 
 static int init_options_default(handler_t *h)
@@ -49,39 +43,16 @@ static int init_options_default(handler_t *h)
     add_new_option(
         h,
         &(opt_t){
-            .l_opt = "--verbose", .s_opt = "-V", .value = NULL, .next = NULL});
-    add_new_option(
-        h,
-        &(opt_t){
-            .l_opt = "--config", .s_opt = "-c", .value = NULL, .next = NULL});
-    add_new_option(
-        h,
-        &(opt_t){
-            .l_opt = "--output", .s_opt = "-o", .value = NULL, .next = NULL});
-    add_new_option(
-        h,
-        &(opt_t){
-            .l_opt = "--input", .s_opt = "-i", .value = NULL, .next = NULL});
-    add_new_option(
-        h,
-        &(opt_t){
-            .l_opt = "--list", .s_opt = "-l", .value = NULL, .next = NULL});
-    add_new_option(
-        h,
-        &(opt_t){
-            .l_opt = "--reset", .s_opt = "-r", .value = NULL, .next = NULL});
-    add_new_option(
-        h,
-        &(opt_t){
-            .l_opt = "--status", .s_opt = "-s", .value = NULL, .next = NULL});
-
+            .l_opt = "--verbose", .s_opt = "-t", .value = NULL, .next = NULL});
     return 0;
 }
 
-static int kfgx_default_handler_action(struct kfgx_cmd_struct *cmd)
+static int kfgx_default_handler_action(opt_t *options)
 {
-    (void)cmd; /* Unused parameter */
-    pr_info("hello world from default handler");
+    if (!options) {
+        pr_debug("options=%p",(void *)options);
+    }
+
     kfgx_default_handler_usage();
     return 0;
 }
@@ -90,7 +61,6 @@ static int kfgx_default_handler_action(struct kfgx_cmd_struct *cmd)
 static handler_t kfgx_handler = {
     .action = kfgx_default_handler_action,
     .init_opt = init_options_default,
-    .usage = kfgx_default_handler_usage,
     .name = "default",
     .prio = -1,
     .ltokens = NULL,

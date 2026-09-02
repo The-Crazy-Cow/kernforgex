@@ -80,57 +80,44 @@ int kfgx_set_default_handler(handler_t *a)
     return 0;
 }
 
+static int kfgx_execute_handler_impl(handler_action_t act, opt_t *opt)
+{
+    return act(opt);
+}
+
 static int kfgx_execute_handler(struct kfgx_cmd_struct *cmd)
 {
+    opt_t *opt = NULL;
+
     if (!cmd) {
         pr_error("cmd=%p", (void *)cmd);
         return -1;
     }
-    if (!cmd->handler) {
-        pr_error("cmd->handler=%p", (void *)cmd->handler);
+
+    if (!cmd->handler || !cmd->handler->action) {
+        pr_error(
+            "handler=%p, handler->action=%p",
+            (void *)cmd->handler,
+            cmd->handler ? (void *)cmd->handler->action : NULL);
         return -1;
     }
-    cmd->ret = cmd->handler->action(cmd);
-    return cmd->ret;
+
+    if (cmd->handler->ltokens) {
+        opt = cmd->handler->ltokens->opt;
+    } else {
+        pr_debug("no tokens matched (ltokens is NULL)");
+    }
+
+    return kfgx_execute_handler_impl(cmd->handler->action, opt);
 }
 
-/**
- * @brief Processes and executes a CLI command payload.
- *
- * Handles the complete lifecycle of a CLI command execution: validates command
- * arguments, resolves the appropriate handler (falling back to @c
- * default_handler if unspecified or lookup fails), initializes handler-specific
- * options, tokenizes inputs, executes the payload, and performs comprehensive
- * memory cleanup.
- *
- * @param[in,out] cmd Pointer to the command context structure containing
- * argument vector and execution states.
- *
- * @return 0 on successful processing and execution.
- * @return -1 if @p cmd is NULL, validation fails, handler resolution fails
- * without a default, or token parsing fails.
- *
- * @note This function guarantees resource teardown by releasing the token list
- *       (@c ltokens) and tearing down registered handlers via @ref
- * kfgx_free_handlers before returning upon successful execution.
- *
- * @warning If argument parsing (@ref kfgx_cli_parser) fails, early exit occurs
- * without invoking handler execution or performing handler deallocation.
- */
-int kfgx_handle(struct kfgx_cmd_struct *cmd)
+static int kfgx_handler_impl(struct kfgx_cmd_struct *cmd)
 {
-    if (!cmd) {
-        pr_warn("cmd=%p", (void *)cmd);
-        return -1;
-    }
-
-    if (check_cli_args(cmd))
-        return -1;
-
     if (cmd->args_nr == 0) {
         pr_debug("args_nr=0");
         goto deflt;
     }
+
     if (kfgx_get_handler(cmd) != 0) {
         pr_warn("Failed to get handler, using default handler");
         if (!default_handler) {
@@ -146,7 +133,7 @@ int kfgx_handle(struct kfgx_cmd_struct *cmd)
 
     // Tokenize CLI arguments
     if (kfgx_cli_parser(cmd)) {
-        pr_warn("failled to parse command line arguments");
+        pr_warn("failed to parse command line arguments");
         return -1;
     }
 
@@ -182,6 +169,42 @@ static int kfgx_unregister_handler_impl(handler_t *h)
     pr_debug("handlers list size=%zu", lhandlers->size);
 
     return 0;
+}
+
+/**
+ * @brief Processes and executes a CLI command payload.
+ *
+ * Handles the complete lifecycle of a CLI command execution: validates command
+ * arguments, resolves the appropriate handler (falling back to @c
+ * default_handler if unspecified or lookup fails), initializes handler-specific
+ * options, tokenizes inputs, executes the payload, and performs comprehensive
+ * memory cleanup.
+ *
+ * @param[in,out] cmd Pointer to the command context structure containing
+ * argument vector and execution states.
+ *
+ * @return 0 on successful processing and execution.
+ * @return -1 if @p cmd is NULL, validation fails, handler resolution fails
+ * without a default, or token parsing fails.
+ *
+ * @note This function guarantees resource teardown by releasing the token list
+ *       (@c ltokens) and tearing down registered handlers via @ref
+ * kfgx_free_handlers before returning upon successful execution.
+ *
+ * @warning If argument parsing (@ref kfgx_cli_parser) fails, early exit occurs
+ * without invoking handler execution or performing handler deallocation.
+ */
+int kfgx_handle(struct kfgx_cmd_struct *cmd)
+{
+    if (!cmd) {
+        pr_warn("cmd=%p", (void *)cmd);
+        return -1;
+    }
+
+    if (check_cli_args(cmd))
+        return -1;
+
+    return kfgx_handler_impl(cmd);
 }
 
 static int check_register_ctxt(const handler_t *h)
@@ -260,7 +283,7 @@ int kfgx_get_handler(const struct kfgx_cmd_struct *cmd)
             return 0;
         }
     }
-    pr_warn(
+    pr_info(
         "no matching handler found for '%s'",
         cmd->args_set ? cmd->args_set[0] : "(null)");
     return -1;

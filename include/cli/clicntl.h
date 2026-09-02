@@ -9,8 +9,7 @@
 #include "handlers.h"
 #include <stddef.h>
 
-#define HAVE_SHORT_OPTION(option, a) ((a) == (option))
-#define HAVE_LONG_OPTION(option, a) (!strcmp((option), (a)))
+#define HAVE_OPTION(option, l_opt) (!strcmp((option), (l_opt)))
 
 /* Token State Flags */
 #define TOKEN_VALID 0x00
