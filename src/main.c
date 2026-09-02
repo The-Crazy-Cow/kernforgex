@@ -2,11 +2,12 @@
 //
 // vim: set ts=8 sw=8 noet tw=80 cc=80 fo+=t :
 
-#include "clicntl.h"
-#include "handers.h"
+#include "handlers.h"
 #include "parser.h"
 #include <stdio.h>
 #include <string.h>
+
+#define STRICT_MODE
 
 int main(int argc, char *argv[], char *envp[])
 {
@@ -16,10 +17,10 @@ int main(int argc, char *argv[], char *envp[])
     }
 
     struct kfgx_cmd_struct cmd = {
-        .ltokens = NULL,
-        .args_nr = argc,
-        .flags = 0,
+        .handler = NULL,
+        .args_nr = argc - 1, // Exclude the program name
         .ret = 0,
+        .args_set = (const char **)argv + 1, // Skip the program name
     };
 
     // insert our default handler
@@ -27,13 +28,10 @@ int main(int argc, char *argv[], char *envp[])
         return -1;
     }
 
-    if (kfgx_cli_parser(&cmd, (argv + 1))) {
+    if (kfgx_handle(&cmd)) {
         fprintf(stderr, "Error: Parsing failed\n");
         return -1;
     }
-
-    kfgx_execute_handler(&cmd);
-    kfgx_cli_token_free(cmd.ltokens);
 
     return 0;
 }

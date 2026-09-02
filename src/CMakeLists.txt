@@ -4,9 +4,10 @@
 
 file(GLOB_RECURSE SOURCE_FILES
     "${CMAKE_SOURCE_DIR}/include/*.c"
+    "${CMAKE_SOURCE_DIR}/include/handlers/*.c"
+    "${CMAKE_SOURCE_DIR}/include/cli/*.c"
     "${CMAKE_SOURCE_DIR}/src/*.c"
-    "${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/*.c"
-    "${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/handlers/*.c"
+    "${CMAKE_SOURCE_DIR}/src/handlers/*.c"
 )
 
 # executable name : kfgx
@@ -21,10 +22,10 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/include/kernforgex/
-    ${CMAKE_SOURCE_DIR}/src/kernforgex/
-    ${CMAKE_SOURCE_DIR}/src/kernforgex/handlers/
+    ${CMAKE_SOURCE_DIR}/include/
+    ${CMAKE_SOURCE_DIR}/include/cli/
+    ${CMAKE_SOURCE_DIR}/include/handlers/
+    ${CMAKE_SOURCE_DIR}/src/handlers/
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE

@@ -2,8 +2,8 @@
 //
 // vim: set ts=8 sw=8 noet tw=80 cc=80 fo+=t :
 
-#ifndef KERNFORGEX_HANDLERS_H
-#define KERNFORGEX_HANDLERS_H
+#ifndef HANDLERS_H
+#define HANDLERS_H
 
 int kfgx_handler_init();
 

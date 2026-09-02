@@ -2,23 +2,25 @@
 //
 // vim: set ts=8 sw=8 noet tw=80 cc=80 fo+=t :
 
-/**
- * @file      prio_lists.c
- * @author    jd
- * @brief
- * @version   0.1
- * @date      2026-08-31
- *
- * @details
- *
- * @copyright GNU General Public License v2.0
- */
+#ifndef INCLUDE_PRIO_LISTS_H
+#define INCLUDE_PRIO_LISTS_H
 
-#include "prio_lists.h"
+#include "handlers.h"
+#include <stddef.h>
 #include <stdlib.h>
 #include <sys/types.h>
 
-handler_t *prio_list_del(struct lhead *self, handler_t *target)
+#define foreach_node(n, _from) for (n = (_from); n != NULL; n = n->next)
+
+/*Head control structure for managing the intrusive handler list
+ * handler_t type is defined in clicntl.h
+ */
+struct lhead {
+    handler_t *head;
+    size_t size;
+};
+
+static inline handler_t *prio_list_del(struct lhead *self, handler_t *target)
 {
     if (!self || !self->head || !target)
         return NULL;
@@ -46,7 +48,7 @@ handler_t *prio_list_del(struct lhead *self, handler_t *target)
     return NULL;
 }
 
-int prio_list_insert(struct lhead *self, handler_t *h)
+static inline int prio_list_insert(struct lhead *self, handler_t *h)
 {
     if (!self || !h)
         return -1;
@@ -73,7 +75,7 @@ int prio_list_insert(struct lhead *self, handler_t *h)
     return 0;
 }
 
-handler_t *prio_list_pop(struct lhead *self)
+static inline handler_t *prio_list_pop(struct lhead *self)
 {
     if (!self || !self->head)
         return NULL;
@@ -86,7 +88,7 @@ handler_t *prio_list_pop(struct lhead *self)
     return extracted;
 }
 
-struct lhead *init_prio_list(void)
+static inline struct lhead *init_prio_list(void)
 {
     struct lhead *l = malloc(sizeof(struct lhead));
     if (!l)
@@ -97,7 +99,7 @@ struct lhead *init_prio_list(void)
     return l;
 }
 
-void free_prio_list(struct lhead *l)
+static inline void free_prio_list(struct lhead *l)
 {
     if (!l)
         return;
@@ -106,3 +108,5 @@ void free_prio_list(struct lhead *l)
     l->size = 0;
     free(l);
 }
+
+#endif /*INCLUDE_PRIO_LISTS_H*/
