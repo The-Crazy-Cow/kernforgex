@@ -5,13 +5,12 @@
 /**
  * @file      debug.c
  * @author    jd
- * @brief     Log level management.
+ * @brief     Log-level management helpers.
  * @version   0.1
- * @date 2026-08-29
+ * @date      2026-08-29
  *
- * @details
- * This file provides functions to get, set, enable, and disable
- * log levels using a bitmask.
+ * @details   This file exposes functions to query, set, enable, and disable
+ *            log levels using a bitmask.
  *
  * @copyright GNU General Public License v2.0
  */

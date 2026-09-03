@@ -5,11 +5,13 @@
 /**
  * @file      handle.c
  * @author    jd
- * @brief
+ * @brief     Handler registry, dispatch control, and default-handler setup.
  * @version   0.1
  * @date      2026-08-29
  *
- * @details
+ * @details   This file keeps the global handler list, validates handler
+ *            configuration, resolves the appropriate handler for CLI input,
+ *            and coordinates execution and cleanup.
  *
  * @copyright GNU General Public License v2.0
  */
@@ -23,8 +25,11 @@ static struct kfgx_cmd_struct cmd;
 static int kfgx_init_handlers(void);
 static int kfgx_free_handlers(void);
 
-/** @brief Resolves and assigns the matching handler action for a command
- * structure. */
+/**
+ * @brief Resolve the handler matching the current command arguments.
+ *
+ * @return 0 when a matching handler is found, otherwise -1.
+ */
 int kfgx_get_handler();
 
 int check_handler(const handler_t *h)
@@ -102,7 +107,8 @@ static int kfgx_execute_handler()
         return -1;
     }
 
-    if (cmd.handler->ltokens) {
+    if (cmd.handler->ltokens && cmd.handler->ltokens->opt &&
+        cmd.handler->ltokens->opt->l_opt) {
         opt = cmd.handler->ltokens->opt;
     } else {
         pr_debug("no tokens matched (ltokens is NULL)");
@@ -182,7 +188,7 @@ static int kfgx_handle_impl()
     ret = kfgx_execute_handler(cmd);
 
     // cleanup all
-    kfgx_token_free(cmd.handler->ltokens);
+    kfgx_token_free(&cmd.handler->ltokens);
     cmd.handler->ltokens = NULL; // ensure
     kfgx_free_handlers();
 
@@ -321,17 +327,17 @@ int kfgx_get_handler()
 {
     handler_t *h;
 
-    if (!cmd.handler)
-        return -1;
     h = cmd.handler;
 
-    if (check_register_ctxt(h)) {
-        return -1;
+    if (h) {
+        pr_debug(
+            "suspicious state: cmd.handler=%p but it should be NULL",
+            (void *)h);
     }
     foreach_node(h, lhandlers->head)
     {
-        // foo@foo$ kfgx name_handler
         if (cmd.args_set && !strcmp(h->name, cmd.args_set[0])) {
+            cmd.handler = h;
             return 0;
         }
     }

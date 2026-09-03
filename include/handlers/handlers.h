@@ -21,9 +21,9 @@ typedef int (*init_options_t)(handler_t *);
 typedef int (*handler_action_t)(opt_t *opt);
 
 /**
- * @brief Action callback signature executed when a handler predicate matches.
+ * @brief Action callback executed when a handler matches the current CLI input.
  *
- * @param[in,out] cmd Pointer to the command context structure.
+ * @param[in,out] opt Pointer to the matched option list for the command.
  * @return 0 on success, or a negative error code on failure.
  */
 typedef struct handler {

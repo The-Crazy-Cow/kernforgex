@@ -5,11 +5,12 @@
 /**
  * @file      shell_completions.c
  * @author    jd
- * @brief
+ * @brief     Generate Bash and sh completion scripts for registered handlers.
  * @version   0.1
  * @date      2026-09-01
  *
- * @details
+ * @details   The file produces completion metadata for the CLI options of a
+ *            handler so the shell can offer context-aware suggestions.
  *
  * @copyright GNU General Public License v2.0
  */
@@ -22,7 +23,7 @@ static int sh_completions_impl(const handler_t *h, const char *filename)
 
     f = fopen(filename, "a");
     if (f == NULL) {
-        pr_error("can't open file %s: %s", filename, strerror(errno));
+        pr_error("cannot open file %s: %s", filename, strerror(errno));
         return -1;
     }
 
@@ -130,7 +131,7 @@ int sh_completions(handler_t *h)
     }
 
     if (init_sh_completions_file()) {
-        pr_error("sh completion file initialisation failed");
+        pr_error("sh completion file initialization failed");
         return -1;
     }
 
