@@ -5,10 +5,10 @@
 #ifndef INCLUDE_CLICNTL_H
 #define INCLUDE_CLICNTL_H
 
+#include <errno.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stddef.h>
-#include <errno.h>
 
 // Consolidates the full core system architecture into a unified master header.
 // #include "clicntl"

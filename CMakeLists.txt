@@ -3,7 +3,7 @@
 # vim: set ts=8 sw=8 noet tw=80 cc=80 fo+=t :
 
 cmake_minimum_required(VERSION 3.10)
-project(kfgx-parser LANGUAGES C)
+project(kfgx LANGUAGES C)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_STANDARD 11)

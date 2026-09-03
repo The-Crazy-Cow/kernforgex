@@ -28,18 +28,9 @@ static void my_handler_usage(void)
 
 static int my_init_options(handler_t *h)
 {
-    add_new_option(
-        h,
-        &(opt_t){
-            .l_opt = "--help", .s_opt = "-h"});
-    add_new_option(
-        h,
-        &(opt_t){
-            .l_opt = "--version", .s_opt = "-v"});
-    add_new_option(
-        h,
-        &(opt_t){
-            .l_opt = "--verbose", .s_opt = "-t"});
+    add_new_option(h, &(opt_t){.l_opt = "--help", .s_opt = "-h"});
+    add_new_option(h, &(opt_t){.l_opt = "--version", .s_opt = "-v"});
+    add_new_option(h, &(opt_t){.l_opt = "--verbose", .s_opt = "-t"});
 
     return 0;
 }
@@ -48,19 +39,20 @@ static int my_handler_action(opt_t *options)
 {
     opt_t *o;
 
-    if(!options){
+    if (!options) {
         my_handler_usage();
-    }else{
-        foreach_node(o,options){
-            if(HAVE_OPTION(o->l_opt,"--help"))
+    } else {
+        foreach_node(o, options)
+        {
+            pr_debug("%s ",o->l_opt);
+            if (HAVE_OPTION(o->l_opt, "--help"))
                 my_handler_usage();
 
-            if(HAVE_OPTION(o->l_opt,"--verbose"))
+            if (HAVE_OPTION(o->l_opt, "--verbose"))
                 printf("we are on verbose mode\n");
 
-            if(HAVE_OPTION(o->l_opt,"--version"))
+            if (HAVE_OPTION(o->l_opt, "--version"))
                 printf("we are on version 1.0.0\n");
-
         }
     }
     return 0;

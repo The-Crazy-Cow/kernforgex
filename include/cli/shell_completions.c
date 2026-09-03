@@ -15,8 +15,6 @@
  */
 #include "clicntl.h"
 
-
-
 static int sh_completions_impl(const handler_t *h, const char *filename)
 {
     token_t *t;
@@ -28,7 +26,9 @@ static int sh_completions_impl(const handler_t *h, const char *filename)
         return -1;
     }
 
-    fprintf(f,"_%s_completion()\n"
+    fprintf(
+        f,
+        "_%s_completion()\n"
         "{\n"
         "    local cur=\"${COMP_WORDS[COMP_CWORD]}\"\n\n"
         "    COMPREPLY=(\n"
@@ -36,7 +36,8 @@ static int sh_completions_impl(const handler_t *h, const char *filename)
         h->name);
 
     if (h->ltokens && h->ltokens->opt) {
-        foreach_node(t, h->ltokens) {
+        foreach_node(t, h->ltokens)
+        {
             if (t->opt->l_opt && t->opt->s_opt) {
                 fprintf(f, "%s %s ", t->opt->l_opt, t->opt->s_opt);
             } else if (t->opt->l_opt) {
@@ -47,7 +48,8 @@ static int sh_completions_impl(const handler_t *h, const char *filename)
         }
     }
 
-    fprintf(f,
+    fprintf(
+        f,
         "\" -- \"$cur\"))\n"
         "}\n\n"
         "complete -F _%s_completion %s\n",
@@ -60,7 +62,10 @@ static int sh_completions_impl(const handler_t *h, const char *filename)
     );
 
     fclose(f);
-    pr_info("generated bash completions file for handler '%s' in '%s'", h->name, filename);
+    pr_info(
+        "generated bash completions file for handler '%s' in '%s'",
+        h->name,
+        filename);
 
     return 0;
 }
@@ -68,11 +73,12 @@ static int sh_completions_impl(const handler_t *h, const char *filename)
 /**
  * @brief Generates a Bash auto-completion script for a given CLI handler.
  *
- * Iterates through the option list associated with the specified command handler
- * and constructs a formatted sh under posixcompletion script file.
+ * Iterates through the option list associated with the specified command
+ * handler and constructs a formatted sh under posixcompletion script file.
  *
  * @param[in] h        Pointer to the command handler configuration structure.
- * @param[in] filename Output file path where the completion script will be written.
+ * @param[in] filename Output file path where the completion script will be
+ * written.
  *
  * @pre \p h and \p filename must not be NULL.
  * @pre \p h->name must be a valid null-terminated string.
@@ -91,19 +97,19 @@ int bash_completions(handler_t *h)
         pr_debug("handler %s has no options", h->name);
     }
 
-    if(init_bash_completions_file()){
+    if (init_bash_completions_file()) {
         pr_error("bash completion file initialization failed");
         return -1;
     }
 
-    return sh_completions_impl(h,BASH_FILENAME);
+    return sh_completions_impl(h, BASH_FILENAME);
 }
 
 /**
  * @brief Generates a sh auto-completion script for a given CLI handler.
  *
- * Iterates through the option list associated with the specified command handler
- * and constructs a formatted sh under posixcompletion script file.
+ * Iterates through the option list associated with the specified command
+ * handler and constructs a formatted sh under posixcompletion script file.
  *
  * @param[in] h        Pointer to the command handler configuration structure.
  *
@@ -113,7 +119,7 @@ int bash_completions(handler_t *h)
  * @retval 0  Success. Script generated without errors.
  * @retval -1 Error. Invalid input parameters or file I/O failure.
  */
-int sh_completions( handler_t *h)
+int sh_completions(handler_t *h)
 {
     if (!h || !h->name) {
         return -1;
@@ -123,10 +129,10 @@ int sh_completions( handler_t *h)
         pr_debug("handler %s has no options", h->name);
     }
 
-    if(init_sh_completions_file()){
+    if (init_sh_completions_file()) {
         pr_error("sh completion file initialisation failed");
         return -1;
     }
 
-    return sh_completions_impl(h,SH_FILENAME);
+    return sh_completions_impl(h, SH_FILENAME);
 }

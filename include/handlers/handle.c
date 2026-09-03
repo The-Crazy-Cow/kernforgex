@@ -115,15 +115,16 @@ int generate_bash_completions()
 {
     handler_t *h;
 
-    if(!lhandlers || !lhandlers->head){
+    if (!lhandlers || !lhandlers->head) {
         pr_debug("no handler set");
         return -1;
     }
 
-    foreach_node(h,lhandlers->head){
+    foreach_node(h, lhandlers->head)
+    {
         // consume high memory, initialize all handlers options
         h->init_opt(h);
-        if(bash_completions(h)){
+        if (bash_completions(h)) {
             pr_error("failed to generate bash completions files");
             return -1;
         }
@@ -135,20 +136,20 @@ int generate_sh_completions()
 {
     handler_t *h;
 
-    if(!lhandlers || lhandlers->head){
+    if (!lhandlers || lhandlers->head) {
         pr_debug("no handler set");
         return -1;
     }
 
-    foreach_node(h,lhandlers->head){
-        if(sh_completions(h)){
+    foreach_node(h, lhandlers->head)
+    {
+        if (sh_completions(h)) {
             pr_error("failed to generate sh completions files");
             return -1;
         }
     }
     return 0;
 }
-
 
 static int kfgx_handle_impl()
 {
@@ -178,7 +179,7 @@ static int kfgx_handle_impl()
         return -1;
     }
 
-    ret=kfgx_execute_handler(cmd);
+    ret = kfgx_execute_handler(cmd);
 
     // cleanup all
     kfgx_token_free(cmd.handler->ltokens);
@@ -212,7 +213,7 @@ static int kfgx_unregister_handler_impl(handler_t *h)
     return 0;
 }
 
-int init_handling(const int argc,char **argv)
+int init_handling(const int argc, char **argv)
 {
     pr_info("init handling");
     if (kfgx_init_handlers()) {
@@ -220,7 +221,7 @@ int init_handling(const int argc,char **argv)
     }
 
     cmd.handler = NULL;
-    cmd.args_nr = argc - 1; // Exclude the program name
+    cmd.args_nr = argc - 1;  // Exclude the program name
     cmd.args_set = argv + 1; // Skip the program name
 
     return 0;
@@ -320,7 +321,7 @@ int kfgx_get_handler()
 {
     handler_t *h;
 
-    if ( !cmd.handler)
+    if (!cmd.handler)
         return -1;
     h = cmd.handler;
 

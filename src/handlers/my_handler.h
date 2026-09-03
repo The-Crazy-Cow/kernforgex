@@ -5,7 +5,7 @@
 #ifndef HANDLERS_H
 #define HANDLERS_H
 
-//to incldue options to generate shell completions, (see shell_completions.h)
+// to incldue options to generate shell completions, (see shell_completions.h)
 #define SHELL_COMPLETIONS
 #define BASH_COMPLETIONS
 #define SH_COMPLETIONS

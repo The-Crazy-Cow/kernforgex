@@ -6,7 +6,7 @@
 #define INCLUDE_SHELL_COMPLETIONS_H
 
 #define BASH_FILENAME "completions.bash"
-#define SH_FILENAME   "completions.sh"
+#define SH_FILENAME "completions.sh"
 
 /**
  * @brief Initializes the Bash completion file with the standard shebang header.
@@ -40,8 +40,8 @@ static inline int init_bash_completions_file(void)
 /**
  * @brief Generates a POSIX-compliant script header for auto-completion.
  *
- * @note POSIX sh and dash do not natively support interactive completion arrays.
- *       This generates a standard /bin/sh fallback header.
+ * @note POSIX sh and dash do not natively support interactive completion
+ * arrays. This generates a standard /bin/sh fallback header.
  *
  * @return int Operation status code:
  * @retval 0  Success. The completion file was initialized properly.
@@ -62,7 +62,7 @@ static inline int init_sh_completions_file(void)
     return 0;
 }
 
-int bash_completions( handler_t *);
-int sh_completions( handler_t *);
+int bash_completions(handler_t *);
+int sh_completions(handler_t *);
 
 #endif /*INCLUDE_SHELL_COMPLETIONS_H*/

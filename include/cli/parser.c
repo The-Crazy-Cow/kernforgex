@@ -221,7 +221,6 @@ int kfgx_cli_parser(struct kfgx_cmd_struct *cmd)
 {
     if (cmd->args_nr == 0) {
         pr_debug("args_nr=0");
-        return 0;
     }
 
     if (!cmd->handler) {
