@@ -2,33 +2,37 @@
 //
 // vim: set ts=8 sw=8 noet tw=80 cc=80 fo+=t :
 
-#include "handlers.h"
-#include "parser.h"
+
 #include <stdio.h>
 #include <string.h>
 
 #define STRICT_MODE
 
-int main(int argc, char *argv[], char *envp[])
+// include handlers header
+#include "clicntl.h"
+
+// include our header
+#include "my_handler.h"
+
+
+
+int main(int argc, char *argv[])
 {
-    (void)envp;
-    if (kfgx_init_handlers()) {
+
+    // init command line handling
+    init_handling(argc,argv);
+
+    // init our handler
+    // insert our default handler in our case it is under src/handlers
+    if (my_handler_init()) {
         return -1;
     }
 
-    struct kfgx_cmd_struct cmd = {
-        .handler = NULL,
-        .args_nr = argc - 1, // Exclude the program name
-        .ret = 0,
-        .args_set = (const char **)argv + 1, // Skip the program name
-    };
+    // avoid this cause high memory on free area
+    generate_bash_completions();
 
-    // insert our default handler
-    if (kfgx_handler_init()) {
-        return -1;
-    }
-
-    if (kfgx_handle(&cmd)) {
+    // handling
+    if (handle()) {
         fprintf(stderr, "Error: Parsing failed\n");
         return -1;
     }

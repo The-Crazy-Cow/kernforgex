@@ -5,21 +5,28 @@
 #ifndef INCLUDE_CLICNTL_H
 #define INCLUDE_CLICNTL_H
 
+#include <stdlib.h>
+#include <string.h>
+#include <stddef.h>
+#include <errno.h>
+
+// Consolidates the full core system architecture into a unified master header.
+// #include "clicntl"
 #include "debug.h"
 #include "handlers.h"
-#include <stddef.h>
+#include "prio_lists.h"
+#include "shell_completions.h"
 
 #define HAVE_OPTION(option, l_opt) (!strcmp((option), (l_opt)))
+#define MATCH_L_OPT(opt, arg) (!strcmp((opt), (arg)))
+#define MATCH_S_OPT(opt, arg) (!strcmp((opt), (arg)))
 
 /* Token State Flags */
 #define TOKEN_VALID 0x00
 #define TOKEN_DIRTY 0x01
 
-typedef struct kfgx_cmd_struct kfgx_cmd_t;
 typedef struct handler handler_t;
-typedef struct kfgx_opt opt_t;
 typedef int (*init_options_t)(handler_t *h);
-typedef struct kfgx_token token_t;
 
 typedef struct kfgx_opt {
     char *l_opt; /* "--foo" long option */
@@ -37,11 +44,111 @@ typedef struct kfgx_token {
 
 struct kfgx_cmd_struct {
     handler_t *handler;
-    const int args_nr;
-    const char **args_set;
-    int ret; /* Handler execution return code */
+    int args_nr;
+    char **args_set;
 };
 
+int kfgx_cli_parser(struct kfgx_cmd_struct *);
+
+static inline int check_option(const opt_t *opt)
+{
+    if (!opt) {
+        pr_warn("option pointer is NULL");
+        return -1;
+    }
+
+    if ((!opt->l_opt || !*opt->l_opt) && (!opt->s_opt || !*opt->s_opt)) {
+        pr_warn("invalid option: must specify at least long_opt or short_opt");
+        return -1;
+    }
+
+    return 0;
+}
+
+[[maybe_unused]]
+static inline int set_token_dirty(token_t *t)
+{
+    if (!t)
+        return -1;
+    t->free = TOKEN_DIRTY;
+    return 0;
+}
+
+static inline int set_token_valid(token_t *t)
+{
+    if (!t)
+        return -1;
+    t->free = TOKEN_VALID;
+    return 0;
+}
+
+/**
+ * @brief Free a CLI token list and its associated options.
+ *
+ * @param[in,out] t Head of the token linked list to release.
+ *
+ * @details Traverses the singly linked list starting at @p t. If the @c free
+ *          flag of a token node is set, all allocated option fields and th
+ *          option structure itself are released. Finally, frees each token
+ * node.
+ *
+ * @note Safe to call with a NULL pointer.
+ */
+static inline void kfgx_token_free(token_t *t)
+{
+    token_t *next;
+
+    if (!t) {
+        pr_debug("token=%p: RAF & UAF risks", (void *)t);
+        return;
+    }
+
+    while (t) {
+        next = t->next;
+        if (t->free && t->opt) {
+            free(t->opt->l_opt);
+            free(t->opt->s_opt);
+            free(t->opt->value);
+            free(t->opt);
+        }
+
+        free(t);
+        t = next;
+    }
+}
+
+static inline token_t *kfgx_get_new_token(const opt_t *opt)
+{
+    token_t *t;
+
+    if (check_option(opt)) {
+        pr_warn("invalid option");
+        return NULL;
+    }
+
+    t = calloc(1, sizeof(token_t));
+    if (!t) {
+        return NULL;
+    }
+
+    t->opt = malloc(sizeof(opt_t));
+    if (!t->opt) {
+        free(t);
+        return NULL;
+    }
+
+    t->opt->l_opt = opt->l_opt ? strdup(opt->l_opt) : NULL;
+    t->opt->s_opt = opt->s_opt ? strdup(opt->s_opt) : NULL;
+    t->opt->value = opt->value ? strdup(opt->value) : NULL;
+
+    t->next = NULL;
+    t->free = 1;
+    set_token_valid(t);
+
+    return t;
+}
+
+// heat
 static inline token_t *kfgx_get_new_token(const opt_t *);
 
 /**
@@ -83,21 +190,6 @@ static inline int add_new_option(handler_t *h, const opt_t *opt)
     return 0;
 }
 
-static inline int check_option(const opt_t *opt)
-{
-    if (!opt) {
-        pr_warn("option pointer is NULL");
-        return -1;
-    }
-
-    if ((!opt->l_opt || !*opt->l_opt) && (!opt->s_opt || !*opt->s_opt)) {
-        pr_warn("invalid option: must specify at least long_opt or short_opt");
-        return -1;
-    }
-
-    return 0;
-}
-
 /**
  * @brief Validate CLI arguments.
  *
@@ -112,9 +204,9 @@ static inline int check_option(const opt_t *opt)
  */
 static inline int check_cli_args(struct kfgx_cmd_struct *cmd)
 {
-    const char **args_set = cmd->args_set;
+    char **args_set = cmd->args_set;
     int nr [[maybe_unused]];
-    const char **set [[maybe_unused]];
+    char **set [[maybe_unused]];
 
     if (!cmd) {
         pr_warn("kfgx_cmd_struct *cmd=%p", (void *)cmd);
@@ -136,7 +228,7 @@ static inline int check_cli_args(struct kfgx_cmd_struct *cmd)
 
     if (nr != 0) {
         pr_fatal("args_set element count != args_nr, remaining=%d", nr);
-        _exit(-1);
+        exit(-1);
     }
 #endif
     return 0;

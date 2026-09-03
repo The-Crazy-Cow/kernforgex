@@ -18,6 +18,7 @@ target_compile_features(${PROJECT_NAME} PRIVATE
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
+    _POSIX_C_SOURCE=200809L
     DEBUG
 )
 

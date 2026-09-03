@@ -13,10 +13,7 @@
  *
  * @copyright GNU General Public License v2.0
  */
-
-#include "parser.h"
-#include "debug.h"
-#include "prio_lists.h"
+#include "clicntl.h"
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
@@ -106,7 +103,7 @@ static void chained_matched_options(token_t *head)
  */
 static int kfgx_cli_tokenizer_impl(struct kfgx_cmd_struct *cmd)
 {
-    const char **set;
+    char **set;
     char *c;
     token_t *t, *lt;
 
@@ -134,7 +131,6 @@ static int kfgx_cli_tokenizer_impl(struct kfgx_cmd_struct *cmd)
 
             memcpy(key, arg, key_len);
             key[key_len] = '\0';
-
             foreach_node(t, lt)
             {
                 if (t->opt && HAVE_OPTION(t->opt->l_opt, key)) {

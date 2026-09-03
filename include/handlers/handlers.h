@@ -5,8 +5,6 @@
 #ifndef INCLUDE_HANDLERS_H
 #define INCLUDE_HANDLERS_H
 
-#define HANDLER_NAME_MAX 30
-
 #define HANDLER_MIN_PRIO -10
 #define HANDLER_MAX_PRIO 20
 
@@ -38,8 +36,6 @@ typedef struct handler {
     struct handler *next;
 } handler_t;
 
-int kfgx_handler_init();
-
 /**
  * @brief Sets the global default handler for CLI execution.
  *
@@ -54,17 +50,13 @@ int kfgx_handler_init();
  * @note The handler passed to this function should be properly initialized
  *       before being set as default.
  */
-int kfgx_set_default_handler(handler_t *);
+int set_default_handler(handler_t *);
 
 /** @brief Main CLI handling function. */
-int kfgx_handle(struct kfgx_cmd_struct *);
+int handle();
 
 /** @brief Validates a handler structure. */
 int check_handler(const handler_t *);
-
-/** @brief Resolves and assigns the matching handler action for a command
- * structure. */
-int kfgx_get_handler(const struct kfgx_cmd_struct *);
 
 /** @brief Registers a new task handler into the global priority list. */
 int register_handler(handler_t *h);
@@ -73,10 +65,10 @@ int register_handler(handler_t *h);
  */
 int unregister_handler(handler_t *);
 
-/** @brief Initializes the handler management subsystem structures. */
-int kfgx_init_handlers(void);
+int init_handling(const int, char **);
 
-/** @brief Cleans up and frees resources allocated by the handler subsystem. */
-int kfgx_free_handlers(void);
+int generate_sh_completions();
+
+int generate_bash_completions();
 
 #endif /*INCLUDE_HANDLERS_H*/

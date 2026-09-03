@@ -1,0 +1,38 @@
+[
+{
+  "directory": "/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/src",
+  "command": "/usr/bin/cc -DRELEASE -D_POSIX_C_SOURCE=200809L -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/cli -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/handlers -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/src/handlers -std=c11 -Wall -Wextra -Wshadow -Werror -Wconversion -Wformat=2 -fmacro-prefix-map=/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex=. -o CMakeFiles/kernforgex.dir/__/include/cli/parser.c.o -c /home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/cli/parser.c",
+  "file": "/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/cli/parser.c",
+  "output": "src/CMakeFiles/kernforgex.dir/__/include/cli/parser.c.o"
+},
+{
+  "directory": "/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/src",
+  "command": "/usr/bin/cc -DRELEASE -D_POSIX_C_SOURCE=200809L -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/cli -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/handlers -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/src/handlers -std=c11 -Wall -Wextra -Wshadow -Werror -Wconversion -Wformat=2 -fmacro-prefix-map=/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex=. -o CMakeFiles/kernforgex.dir/__/include/cli/shell_completions.c.o -c /home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/cli/shell_completions.c",
+  "file": "/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/cli/shell_completions.c",
+  "output": "src/CMakeFiles/kernforgex.dir/__/include/cli/shell_completions.c.o"
+},
+{
+  "directory": "/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/src",
+  "command": "/usr/bin/cc -DRELEASE -D_POSIX_C_SOURCE=200809L -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/cli -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/handlers -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/src/handlers -std=c11 -Wall -Wextra -Wshadow -Werror -Wconversion -Wformat=2 -fmacro-prefix-map=/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex=. -o CMakeFiles/kernforgex.dir/__/include/debug.c.o -c /home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/debug.c",
+  "file": "/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/debug.c",
+  "output": "src/CMakeFiles/kernforgex.dir/__/include/debug.c.o"
+},
+{
+  "directory": "/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/src",
+  "command": "/usr/bin/cc -DRELEASE -D_POSIX_C_SOURCE=200809L -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/cli -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/handlers -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/src/handlers -std=c11 -Wall -Wextra -Wshadow -Werror -Wconversion -Wformat=2 -fmacro-prefix-map=/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex=. -o CMakeFiles/kernforgex.dir/__/include/handlers/handle.c.o -c /home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/handlers/handle.c",
+  "file": "/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/handlers/handle.c",
+  "output": "src/CMakeFiles/kernforgex.dir/__/include/handlers/handle.c.o"
+},
+{
+  "directory": "/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/src",
+  "command": "/usr/bin/cc -DRELEASE -D_POSIX_C_SOURCE=200809L -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/cli -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/handlers -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/src/handlers -std=c11 -Wall -Wextra -Wshadow -Werror -Wconversion -Wformat=2 -fmacro-prefix-map=/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex=. -o CMakeFiles/kernforgex.dir/handlers/my_handler.c.o -c /home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/src/handlers/my_handler.c",
+  "file": "/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/src/handlers/my_handler.c",
+  "output": "src/CMakeFiles/kernforgex.dir/handlers/my_handler.c.o"
+},
+{
+  "directory": "/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/src",
+  "command": "/usr/bin/cc -DRELEASE -D_POSIX_C_SOURCE=200809L -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/cli -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/include/handlers -I/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/src/handlers -std=c11 -Wall -Wextra -Wshadow -Werror -Wconversion -Wformat=2 -fmacro-prefix-map=/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex=. -o CMakeFiles/kernforgex.dir/main.c.o -c /home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/src/main.c",
+  "file": "/home/alice/Documents/parrot/@home/jd/Documents/sys-prog/kernforgex/src/main.c",
+  "output": "src/CMakeFiles/kernforgex.dir/main.c.o"
+}
+]

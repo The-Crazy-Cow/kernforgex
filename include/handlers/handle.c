@@ -14,13 +14,18 @@
  * @copyright GNU General Public License v2.0
  */
 
-#include "debug.h"
-#include "handlers.h"
-#include "parser.h"
-#include "prio_lists.h"
+#include "clicntl.h"
 
 static handler_t *default_handler;
 static struct lhead *lhandlers;
+static struct kfgx_cmd_struct cmd;
+
+static int kfgx_init_handlers(void);
+static int kfgx_free_handlers(void);
+
+/** @brief Resolves and assigns the matching handler action for a command
+ * structure. */
+int kfgx_get_handler();
 
 int check_handler(const handler_t *h)
 {
@@ -60,7 +65,7 @@ int check_handler(const handler_t *h)
     return HANDLER_UNREGISTERED;
 }
 
-int kfgx_set_default_handler(handler_t *a)
+int set_default_handler(handler_t *a)
 {
     if (!a) {
         pr_warn("attempted to set NULL as default handler");
@@ -85,66 +90,102 @@ static int kfgx_execute_handler_impl(handler_action_t act, opt_t *opt)
     return act(opt);
 }
 
-static int kfgx_execute_handler(struct kfgx_cmd_struct *cmd)
+static int kfgx_execute_handler()
 {
     opt_t *opt = NULL;
 
-    if (!cmd) {
-        pr_error("cmd=%p", (void *)cmd);
-        return -1;
-    }
-
-    if (!cmd->handler || !cmd->handler->action) {
+    if (!cmd.handler || !cmd.handler->action) {
         pr_error(
             "handler=%p, handler->action=%p",
-            (void *)cmd->handler,
-            cmd->handler ? (void *)cmd->handler->action : NULL);
+            (void *)cmd.handler,
+            cmd.handler ? (void *)cmd.handler->action : NULL);
         return -1;
     }
 
-    if (cmd->handler->ltokens) {
-        opt = cmd->handler->ltokens->opt;
+    if (cmd.handler->ltokens) {
+        opt = cmd.handler->ltokens->opt;
     } else {
         pr_debug("no tokens matched (ltokens is NULL)");
     }
 
-    return kfgx_execute_handler_impl(cmd->handler->action, opt);
+    return kfgx_execute_handler_impl(cmd.handler->action, opt);
 }
 
-static int kfgx_handler_impl(struct kfgx_cmd_struct *cmd)
+int generate_bash_completions()
 {
-    if (cmd->args_nr == 0) {
+    handler_t *h;
+
+    if(!lhandlers || !lhandlers->head){
+        pr_debug("no handler set");
+        return -1;
+    }
+
+    foreach_node(h,lhandlers->head){
+        // consume high memory, initialize all handlers options
+        h->init_opt(h);
+        if(bash_completions(h)){
+            pr_error("failed to generate bash completions files");
+            return -1;
+        }
+    }
+    return 0;
+}
+
+int generate_sh_completions()
+{
+    handler_t *h;
+
+    if(!lhandlers || lhandlers->head){
+        pr_debug("no handler set");
+        return -1;
+    }
+
+    foreach_node(h,lhandlers->head){
+        if(sh_completions(h)){
+            pr_error("failed to generate sh completions files");
+            return -1;
+        }
+    }
+    return 0;
+}
+
+
+static int kfgx_handle_impl()
+{
+    int ret;
+
+    if (cmd.args_nr == 0) {
         pr_debug("args_nr=0");
         goto deflt;
     }
 
-    if (kfgx_get_handler(cmd) != 0) {
+    if (kfgx_get_handler() != 0) {
         pr_warn("Failed to get handler, using default handler");
         if (!default_handler) {
             pr_fatal("default handler not set");
             return -1;
         }
     deflt:
-        cmd->handler = default_handler;
+        cmd.handler = default_handler;
     }
 
     // Initialize handler options
-    cmd->handler->init_opt(cmd->handler);
+    cmd.handler->init_opt(cmd.handler);
 
     // Tokenize CLI arguments
-    if (kfgx_cli_parser(cmd)) {
+    if (kfgx_cli_parser(&cmd)) {
         pr_warn("failed to parse command line arguments");
         return -1;
     }
 
-    kfgx_execute_handler(cmd);
+    ret=kfgx_execute_handler(cmd);
 
     // cleanup all
-    kfgx_token_free(cmd->handler->ltokens);
-    cmd->handler->ltokens = NULL; // ensure
+    kfgx_token_free(cmd.handler->ltokens);
+    cmd.handler->ltokens = NULL; // ensure
     kfgx_free_handlers();
 
-    return 0;
+    return ret;
 }
 
 static int kfgx_register_handler_impl(handler_t *h)
@@ -167,6 +208,20 @@ static int kfgx_unregister_handler_impl(handler_t *h)
     }
     pr_info("unregistered handler '%s'", h->name);
     pr_debug("handlers list size=%zu", lhandlers->size);
+
+    return 0;
+}
+
+int init_handling(const int argc,char **argv)
+{
+    pr_info("init handling");
+    if (kfgx_init_handlers()) {
+        return -1;
+    }
+
+    cmd.handler = NULL;
+    cmd.args_nr = argc - 1; // Exclude the program name
+    cmd.args_set = argv + 1; // Skip the program name
 
     return 0;
 }
@@ -194,17 +249,12 @@ static int kfgx_unregister_handler_impl(handler_t *h)
  * @warning If argument parsing (@ref kfgx_cli_parser) fails, early exit occurs
  * without invoking handler execution or performing handler deallocation.
  */
-int kfgx_handle(struct kfgx_cmd_struct *cmd)
+int handle()
 {
-    if (!cmd) {
-        pr_warn("cmd=%p", (void *)cmd);
-        return -1;
-    }
-
-    if (check_cli_args(cmd))
+    if (check_cli_args(&cmd))
         return -1;
 
-    return kfgx_handler_impl(cmd);
+    return kfgx_handle_impl(cmd);
 }
 
 static int check_register_ctxt(const handler_t *h)
@@ -238,7 +288,7 @@ int unregister_handler(handler_t *h)
     return kfgx_unregister_handler_impl(h);
 }
 
-int kfgx_init_handlers(void)
+static int kfgx_init_handlers(void)
 {
     lhandlers = init_prio_list();
     if (lhandlers)
@@ -248,7 +298,7 @@ int kfgx_init_handlers(void)
     exit(-1);
 }
 
-int kfgx_free_handlers(void)
+static int kfgx_free_handlers(void)
 {
     if (!lhandlers)
         return 0;
@@ -266,12 +316,13 @@ int kfgx_free_handlers(void)
     return 0;
 }
 
-int kfgx_get_handler(const struct kfgx_cmd_struct *cmd)
+int kfgx_get_handler()
 {
     handler_t *h;
-    if (!cmd || !cmd->handler)
+
+    if ( !cmd.handler)
         return -1;
-    h = cmd->handler;
+    h = cmd.handler;
 
     if (check_register_ctxt(h)) {
         return -1;
@@ -279,12 +330,12 @@ int kfgx_get_handler(const struct kfgx_cmd_struct *cmd)
     foreach_node(h, lhandlers->head)
     {
         // foo@foo$ kfgx name_handler
-        if (cmd->args_set && !strcmp(h->name, cmd->args_set[0])) {
+        if (cmd.args_set && !strcmp(h->name, cmd.args_set[0])) {
             return 0;
         }
     }
     pr_info(
         "no matching handler found for '%s'",
-        cmd->args_set ? cmd->args_set[0] : "(null)");
+        cmd.args_set ? cmd.args_set[0] : "(null)");
     return -1;
 }
